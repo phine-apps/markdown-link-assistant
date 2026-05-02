@@ -36,9 +36,16 @@ const API_KEY_NAMES: Record<string, string> = {
 
 function parseArgs(arg1: unknown, arg2: unknown): { url: string | undefined; range: vscode.Range | undefined } {
   if (Array.isArray(arg1)) {
-    return { url: arg1[0] as string, range: ensureRange(arg1[1]) };
+    return { 
+      url: typeof arg1[0] === 'string' ? arg1[0] : undefined, 
+      range: arg1[1] ? ensureRange(arg1[1]) : undefined 
+    };
   }
-  return { url: arg1 as string | undefined, range: arg2 ? ensureRange(arg2) : undefined };
+  // If arg1 is a vscode.Uri (common in context menus), it's not the URL we want to preview.
+  return { 
+    url: typeof arg1 === 'string' ? arg1 : undefined, 
+    range: arg2 ? ensureRange(arg2) : undefined 
+  };
 }
 
 
@@ -180,27 +187,38 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "markdown-link-assistant.openLivePreview",
-      async (url: string) => {
-        if (!url) {
-          // If called without args, try to find URL at cursor
+      async (arg1?: unknown) => {
+        let { url } = parseArgs(arg1, undefined);
+
+        if (!url || !url.startsWith("http")) {
+          // If called without a valid URL arg, try to find URL at cursor
           const editor = vscode.window.activeTextEditor;
           if (!editor) {
             return;
           }
           const pos = editor.selection.active;
-          const line = editor.document.lineAt(pos.line).text;
-          const urlRegex = /https?:\/\/[^\s)\]"'<>]+(?:\([^\s)\]"'<>]+\)[^\s)\]"'<>]*)*/g;
-          let match;
-          while ((match = urlRegex.exec(line)) !== null) {
-            const start = match.index;
-            const end = start + match[0].length;
-            if (pos.character >= start && pos.character <= end) {
-              url = match[0];
-              break;
+          
+          // 1. Try to find existing link/card first
+          const existing = getExistingLinkRange(editor.document, pos);
+          if (existing) {
+            url = existing.url;
+          } else {
+            // 2. Fallback: Search for raw URL on current line
+            const line = editor.document.lineAt(pos.line).text;
+            const urlRegex = /https?:\/\/[^\s)\]"'<>]+(?:\([^\s)\]"'<>]+\)[^\s)\]"'<>]*)*/g;
+            let match;
+            while ((match = urlRegex.exec(line)) !== null) {
+              const start = match.index;
+              const end = start + match[0].length;
+              if (pos.character >= start && pos.character <= end) {
+                url = match[0];
+                break;
+              }
             }
           }
         }
-        if (url) {
+
+        if (url && url.startsWith("http")) {
           vscode.commands.executeCommand("simpleBrowser.show", url);
         } else {
           vscode.window.showInformationMessage(vscode.l10n.t("Cursor is not on a URL."));
