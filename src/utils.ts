@@ -270,7 +270,7 @@ export function getExistingLinkRange(
     if (position.character >= start && position.character <= end) {
       return {
         url,
-        range: new vscode.Range(position.line, start, position.line, start + linkMatch.length),
+        range: new vscode.Range(position.line, start, position.line, end),
         fullRange: new vscode.Range(position.line, start, position.line, end),
         isImage: linkMatch.startsWith("!"),
       };
