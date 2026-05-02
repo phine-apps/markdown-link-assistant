@@ -251,13 +251,13 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^25.6.0",
     "@types/sinon": "^21.0.1",
-    "@types/vscode": "1.97.0",
+    "@types/vscode": "1.118.0",
     "@typescript-eslint/eslint-plugin": "^8.59.1",
     "@typescript-eslint/parser": "^8.59.1",
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.9.1",
     "esbuild": "^0.28.0",
-    "eslint": "^10.2.1",
+    "eslint": "^10.3.0",
     "glob": "^13.0.6",
     "mocha": "^11.7.5",
     "sinon": "^21.1.2",
@@ -266,7 +266,7 @@
   },
   "dependencies": {
     "cheerio": "^1.2.0",
-    "undici": "^8.1.0"
+    "undici": "^8.2.0"
   },
   "overrides": {
     "mocha": {
