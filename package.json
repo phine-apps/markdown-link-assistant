@@ -1,0 +1,277 @@
+{
+  "name": "markdown-link-assistant",
+  "packageManager": "pnpm@11.0.1",
+  "displayName": "Markdown Link Assistant",
+  "description": "The ultimate link manager for Markdown. Effortless unfurling, Notion-like cards, AI summaries, and instant previews.",
+  "l10n": "./l10n",
+  "version": "1.0.0",
+  "icon": "icons/icon128.png",
+  "publisher": "phine-apps",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phine-apps/markdown-link-assistant.git"
+  },
+  "bugs": {
+    "url": "https://github.com/phine-apps/markdown-link-assistant/issues"
+  },
+  "homepage": "https://github.com/phine-apps/markdown-link-assistant#readme",
+  "preview": true,
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
+  "badges": [
+    {
+      "url": "https://github.com/phine-apps/markdown-link-assistant/actions/workflows/ci.yml/badge.svg",
+      "href": "https://github.com/phine-apps/markdown-link-assistant/actions/workflows/ci.yml",
+      "description": "Build Status"
+    }
+  ],
+  "engines": {
+    "vscode": "^1.97.0",
+    "node": ">=24"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages",
+    "Formatters"
+  ],
+  "keywords": [
+    "markdown",
+    "link",
+    "unfurl",
+    "preview",
+    "assistant",
+    "notion",
+    "ai",
+    "gemini",
+    "ogp"
+  ],
+  "activationEvents": [
+    "onLanguage:markdown"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "documentPasteEdits": [
+      {
+        "selector": [
+          {
+            "language": "markdown"
+          }
+        ],
+        "kind": "markdown.link.assistant.inline",
+        "label": "%paste.inline.label%",
+        "pasteMimeTypes": [
+          "text/plain"
+        ]
+      },
+      {
+        "selector": [
+          {
+            "language": "markdown"
+          }
+        ],
+        "kind": "markdown.link.assistant.card",
+        "label": "%paste.card.label%",
+        "pasteMimeTypes": [
+          "text/plain"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "markdown-link-assistant.openLivePreview",
+        "title": "%command.openLivePreview%"
+      },
+      {
+        "command": "markdown-link-assistant.refreshUnfurl",
+        "title": "%command.refreshUnfurl%"
+      },
+      {
+        "command": "markdown-link-assistant.unfurlAtCursor",
+        "title": "%command.unfurlAtCursor%"
+      },
+      {
+        "command": "markdown-link-assistant.generateReferences",
+        "title": "%command.generateReferences%"
+      },
+      {
+        "command": "markdown-link-assistant.generateAltText",
+        "title": "%command.generateAltText%"
+      },
+      {
+        "command": "markdown-link-assistant.validateLinks",
+        "title": "%command.validateLinks%"
+      },
+      {
+        "command": "markdown-link-assistant.bulkUnfurl",
+        "title": "%command.bulkUnfurl%"
+      },
+      {
+        "command": "markdown-link-assistant.setApiKey",
+        "title": "%command.setApiKey%"
+      },
+      {
+        "command": "markdown-link-assistant.clearApiKey",
+        "title": "%command.clearApiKey%"
+      },
+      {
+        "command": "markdown-link-assistant.checkApiKey",
+        "title": "%command.checkApiKeyStatus%"
+      },
+      {
+        "command": "markdown-link-assistant.clearCache",
+        "title": "%command.clearCache%"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "markdown-link-assistant.openLivePreview",
+          "when": "editorLangId == markdown",
+          "group": "markdown-link-assistant-group@1"
+        },
+        {
+          "command": "markdown-link-assistant.refreshUnfurl",
+          "when": "editorLangId == markdown",
+          "group": "markdown-link-assistant-group@2"
+        },
+        {
+          "command": "markdown-link-assistant.unfurlAtCursor",
+          "when": "editorLangId == markdown",
+          "group": "markdown-link-assistant-group@3"
+        },
+        {
+          "command": "markdown-link-assistant.generateAltText",
+          "when": "editorLangId == markdown",
+          "group": "markdown-link-assistant-group@4"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Markdown Link Assistant",
+      "properties": {
+        "markdown-link-assistant.aiProvider": {
+          "type": "string",
+          "default": "builtin",
+          "enum": [
+            "builtin",
+            "gemini",
+            "claude",
+            "openai"
+          ],
+          "enumDescriptions": [
+            "%config.aiProvider.builtin%",
+            "%config.aiProvider.gemini%",
+            "%config.aiProvider.claude%",
+            "%config.aiProvider.openai%"
+          ],
+          "description": "%config.aiProvider.description%"
+        },
+        "markdown-link-assistant.autoUnfurl": {
+          "type": "boolean",
+          "default": true,
+          "description": "%config.autoUnfurl.description%"
+        },
+        "markdown-link-assistant.geminiModel": {
+          "type": "string",
+          "default": "gemini-2.5-flash",
+          "description": "%config.geminiModel.description%"
+        },
+        "markdown-link-assistant.claudeModel": {
+          "type": "string",
+          "default": "claude-3-5-sonnet-latest",
+          "description": "%config.claudeModel.description%"
+        },
+        "markdown-link-assistant.openaiModel": {
+          "type": "string",
+          "default": "gpt-4o-mini",
+          "description": "%config.openaiModel.description%"
+        },
+        "markdown-link-assistant.geminiEndpoint": {
+          "type": "string",
+          "default": "",
+          "description": "%config.geminiEndpoint.description%"
+        },
+        "markdown-link-assistant.claudeEndpoint": {
+          "type": "string",
+          "default": "",
+          "description": "%config.claudeEndpoint.description%"
+        },
+        "markdown-link-assistant.openaiEndpoint": {
+          "type": "string",
+          "default": "",
+          "description": "%config.openaiEndpoint.description%"
+        },
+        "markdown-link-assistant.defaultPasteFormat": {
+          "type": "string",
+          "default": "ask",
+          "enum": [
+            "none",
+            "ask",
+            "inline",
+            "card",
+            "title"
+          ],
+          "enumDescriptions": [
+            "%config.defaultPasteFormat.none%",
+            "%config.defaultPasteFormat.ask%",
+            "%config.defaultPasteFormat.inline%",
+            "%config.defaultPasteFormat.card%",
+            "%config.defaultPasteFormat.title%"
+          ],
+          "description": "%config.defaultPasteFormat.description%"
+        },
+        "markdown-link-assistant.enableCodeLens": {
+          "type": "boolean",
+          "default": false,
+          "description": "%config.enableCodeLens.description%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run build-prod",
+    "build-prod": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --minify",
+    "compile": "pnpm run check-types && esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "watch": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package --no-dependencies",
+    "publish:vsce": "vsce publish",
+    "publish:ovsx": "npx ovsx publish"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^25.6.0",
+    "@types/sinon": "^21.0.1",
+    "@types/vscode": "1.97.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.1",
+    "@typescript-eslint/parser": "^8.59.1",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.9.1",
+    "esbuild": "^0.28.0",
+    "eslint": "^10.2.1",
+    "glob": "^13.0.6",
+    "mocha": "^11.7.5",
+    "sinon": "^21.1.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.1"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "undici": "^8.1.0"
+  },
+  "overrides": {
+    "mocha": {
+      "diff": "8.0.3",
+      "serialize-javascript": "7.0.3"
+    }
+  }
+}

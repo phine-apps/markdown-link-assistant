@@ -1,0 +1,44 @@
+{
+  "paste.inline.label": "Markdown Link: 行内链接 (AI 摘要)",
+  "paste.card.label": "Markdown Link: 富文本卡片 (AI 摘要)",
+  "paste.title.label": "Markdown Link: 链接 (仅标题)",
+  "command.openLivePreview": "Markdown Link: 打开实时预览",
+  "command.refreshUnfurl": "Markdown Link: 刷新链接信息",
+  "command.unfurlAtCursor": "Markdown Link: 在光标处展开链接",
+  "command.generateReferences": "Markdown Link: 生成参考文献部分",
+  "command.pasteFromHistory": "Markdown Link: 从历史记录粘贴 URL",
+  "command.validateLinks": "Markdown Link: 验证文档中的所有链接",
+  "command.bulkUnfurl": "Markdown Link: 批量展开文档中的所有链接",
+  "command.smartTitleAtCursor": "Markdown Link: 链接 (仅标题)",
+  "command.generateAltText": "Markdown Link: 使用 AI 生成 Alt 文本",
+  "command.setApiKey": "Markdown Link: 设置 AI API 密钥",
+  "command.clearApiKey": "Markdown Link: 清除 API 密钥",
+  "command.checkApiKeyStatus": "Markdown Link: 检查 API 密钥状态",
+  "config.aiProvider.description": "选择用于生成链接描述的 AI 提供商。",
+  "config.aiProvider.builtin": "使用 VS Code / GitHub Copilot 内置 AI (无需密钥)",
+  "config.aiProvider.gemini": "使用 Google Gemini API",
+  "config.aiProvider.claude": "使用 Anthropic Claude API",
+  "config.aiProvider.openai": "使用 OpenAI GPT API",
+  "config.autoUnfurl.description": "粘贴链接时自动显示展开选项。",
+  "config.defaultPasteFormat.description": "选择在 Markdown 中粘贴 URL 时的默认格式。",
+  "config.defaultPasteFormat.none": "无（标准 VS Code 行为）",
+  "config.defaultPasteFormat.ask": "每次询问（显示选择菜单）",
+  "config.defaultPasteFormat.inline": "行内链接（如果启用 AI 摘要）",
+
+  "config.defaultPasteFormat.card": "富文本卡片（如果启用 AI 摘要）",
+  "config.defaultPasteFormat.title": "链接（仅标题，不使用 AI）",
+  "config.enableCodeLens.description": "在 Markdown 文件中的原始 URL 上方显示 “Link Assistant” 提示。",
+  "prompt.pasteSelection": "您想如何粘贴此链接？",
+  "format.inline.label": "行内链接",
+  "format.inline.desc": "格式化为带有 AI 摘要的 [标题](URL)",
+  "format.card.label": "富文本卡片",
+  "format.card.desc": "格式化为 HTML 富文本卡片",
+  "format.title.label": "链接 (仅标题)",
+  "format.title.desc": "格式化为不带 AI 的 [标题](URL)",
+  "format.url.label": "仅 URL",
+  "format.url.desc": "保持原始 URL 為文本"
+}
+
+
+
+
