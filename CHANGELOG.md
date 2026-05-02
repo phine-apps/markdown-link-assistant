@@ -2,6 +2,11 @@
 
 All notable changes to the "Markdown Link Assistant" extension will be documented in this file.
 
+## [1.0.1] - 2026-05-02
+
+### Changed
+- Internal CI/CD improvements and build script stability fixes.
+
 ## [1.0.0] - 2026-05-02
 
 ### Added
