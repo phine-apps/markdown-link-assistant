@@ -4,7 +4,7 @@
   "displayName": "Markdown Link Assistant",
   "description": "The ultimate link manager for Markdown. Effortless unfurling, Notion-like cards, AI summaries, and instant previews.",
   "l10n": "./l10n",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "icon": "icons/icon128.png",
   "publisher": "phine-apps",
   "license": "MIT",
@@ -16,7 +16,6 @@
     "url": "https://github.com/phine-apps/markdown-link-assistant/issues"
   },
   "homepage": "https://github.com/phine-apps/markdown-link-assistant#readme",
-  "preview": true,
   "galleryBanner": {
     "color": "#1e1e1e",
     "theme": "dark"
@@ -243,7 +242,7 @@
     "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
     "test": "node ./out/test/runTest.js",
     "package": "vsce package --no-dependencies",
-    "publish:vsce": "vsce publish",
+    "publish:vsce": "vsce publish --no-dependencies",
     "publish:ovsx": "npx ovsx publish"
   },
   "devDependencies": {
