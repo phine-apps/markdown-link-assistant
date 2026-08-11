@@ -16,7 +16,7 @@ export interface LinkMetadata {
   siteName?: string;
   // Site-specific
   youtube?: { channelName: string; duration: string; publishDate: string };
-  github?: { stars: string; description: string; lastUpdate: string };
+  github?: { stars: string; forks: string; issues: string; description: string };
   qiita?: { likes: string; author: string };
   zenn?: { likes: string; author: string };
   stackOverflow?: { score: string; answers: string; isAccepted: boolean };
@@ -39,6 +39,55 @@ export async function getMetadataForUrl(url: string): Promise<LinkMetadata> {
   const cached = metadataCache.get(url);
   if (cached) {
     return cached;
+  }
+
+  // Intercept Stack Overflow specifically since it blocks bots (403) and has a free open API
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname.toLowerCase();
+    if (hostname === "stackoverflow.com" || hostname.endsWith(".stackoverflow.com")) {
+      const qMatch = parsedUrl.pathname.match(/^\/questions\/(\d+)/) || parsedUrl.pathname.match(/^\/q\/(\d+)/);
+      if (qMatch) {
+        const qId = qMatch[1];
+        const apiRes = await fetch(`https://api.stackexchange.com/2.3/questions/${qId}?site=stackoverflow&filter=withbody`, {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          dispatcher: getDispatcher() as any,
+        });
+        if (apiRes.ok) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const data = (await apiRes.json()) as any;
+          if (data && data.items && data.items.length > 0) {
+            const item = data.items[0];
+            const title = cheerio.load(item.title).text(); // Decode HTML entities
+            
+            let description = "";
+            if (item.body) {
+              description = cheerio.load(item.body).text().replace(/\s+/g, " ").trim();
+              if (description.length > 200) {
+                description = description.substring(0, 200) + "...";
+              }
+            }
+            
+            const metadata: LinkMetadata = {
+              url,
+              title: `${title} - Stack Overflow`,
+              description,
+              image: item.owner?.profile_image,
+              siteName: "Stack Overflow",
+              stackOverflow: {
+                score: item.score?.toString() || "0",
+                answers: item.answer_count?.toString() || "0",
+                isAccepted: !!item.accepted_answer_id
+              }
+            };
+            addToCache(url, metadata);
+            return metadata;
+          }
+        }
+      }
+    }
+  } catch (_e) {
+    // Ignore and fallback to normal HTML scraping if API fails
   }
 
   const controller = new AbortController();
@@ -193,32 +242,49 @@ export async function getMetadataForUrl(url: string): Promise<LinkMetadata> {
         $('a[href$="/stargazers"] .Counter').first().text().trim() ||
         $('span#repo-stars-counter-star').text().trim() || 
         "Unknown";
-      
-      const lastUpdate =
-        $("relative-time").attr("datetime") || 
-        $('meta[property="og:updated_time"]').attr("content") ||
-        "Unknown Update";
+        
+      const forks =
+        $('a[href$="/forks"] .Counter').first().text().trim() ||
+        $('span#repo-network-counter').text().trim() || 
+        "Unknown";
+
+      const issues =
+        $('a[id="issues-tab"] .Counter').first().text().trim() ||
+        $('a[data-selected-links^="repo_issues"] .Counter').first().text().trim() || 
+        "Unknown";
 
       metadata.github = {
         stars,
+        forks,
+        issues,
         description: repoDesc,
-        lastUpdate,
       };
     } else if (isQiita) {
       // Qiita author is often in twitter:creator or we can use the URL path (e.g. /@username)
       let author = $('meta[name="twitter:creator"]').attr("content") || "";
       if (!author) {
         const match = url.match(/qiita\.com\/([^/]+)/);
-        if (match && match[1]) {
+        const invalidAuthors = ["tags", "organizations", "advent-calendar", "search", "official-events", "official-campaigns"];
+        if (match && match[1] && !invalidAuthors.includes(match[1])) {
           author = match[1].startsWith("@") ? match[1] : `@${match[1]}`;
         } else {
           author = "Unknown";
         }
       }
       
-      // Attempt to find likes, but might be difficult if SSR only. Fallback to Unknown.
-      // Often, the title format is "Title - Qiita", we could also try to clean up title
-      const likes = "Unknown"; // Dynamic loaded in Qiita, hard to extract reliably from plain HTML
+      let likes = "Unknown";
+      try {
+        const jsonNode = $('script[type="application/json"]').toArray().find(el => $(el).html()?.includes('"likesCount"'));
+        if (jsonNode) {
+          const text = $(jsonNode).html() || "";
+          const match = text.match(/"likesCount":(\d+)/);
+          if (match && match[1]) {
+            likes = match[1];
+          }
+        }
+      } catch (_e) {
+        // Fallback to Unknown
+      }
       
       metadata.qiita = { author, likes };
     } else if (isZenn) {
@@ -229,8 +295,19 @@ export async function getMetadataForUrl(url: string): Promise<LinkMetadata> {
         author = `@${match[1]}`;
       }
       
-      // Likes are also dynamically loaded or embedded in script tags. Fallback to Unknown.
-      const likes = "Unknown";
+      let likes = "Unknown";
+      try {
+        const nextData = $('#__NEXT_DATA__').html();
+        if (nextData) {
+          const data = JSON.parse(nextData);
+          const article = data?.props?.pageProps?.article;
+          if (article && article.likedCount !== undefined) {
+            likes = article.likedCount.toString();
+          }
+        }
+      } catch (_e) {
+        // Fallback to Unknown
+      }
       
       metadata.zenn = { author, likes };
     } else if (isStackOverflow) {

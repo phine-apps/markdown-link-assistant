@@ -276,7 +276,7 @@ async function callGemini(
     }
 
     const config = vscode.workspace.getConfiguration("markdown-link-assistant");
-    const modelName = config.get<string>("geminiModel", "gemini-2.5-flash");
+    const modelName = config.get<string>("geminiModel", "gemini-3.6-flash");
     const apiVersion = modelName.includes("preview") ? "v1beta" : "v1";
     const customEndpoint = config.get<string>("geminiEndpoint", "");
     const baseUrl =
@@ -348,7 +348,7 @@ async function callClaude(
     const config = vscode.workspace.getConfiguration("markdown-link-assistant");
     const modelName = config.get<string>(
       "claudeModel",
-      "claude-3-5-sonnet-latest",
+      "claude-sonnet-5",
     );
     const customEndpoint = config.get<string>("claudeEndpoint", "");
     const baseUrl =
@@ -414,7 +414,7 @@ async function callOpenAI(
     }
 
     const config = vscode.workspace.getConfiguration("markdown-link-assistant");
-    const modelName = config.get<string>("openaiModel", "gpt-4o-mini");
+    const modelName = config.get<string>("openaiModel", "gpt-5-mini");
     const customEndpoint = config.get<string>("openaiEndpoint", "");
     const baseUrl =
       customEndpoint.replace(/\/$/, "") || "https://api.openai.com/v1";

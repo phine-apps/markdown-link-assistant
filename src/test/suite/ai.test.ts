@@ -47,7 +47,7 @@ suite("AI Service Test Suite", () => {
     const [url, init] = fetchStub.firstCall.args as [string, RequestInit];
     assert.strictEqual(url, "https://api.openai.com/v1/chat/completions");
     const body = JSON.parse(init.body as string);
-    assert.strictEqual(body.model, "gpt-4o-mini");
+    assert.strictEqual(body.model, "gpt-5-mini");
   });
 
   test("should call Gemini and parse response", async () => {
@@ -68,7 +68,7 @@ suite("AI Service Test Suite", () => {
     const [url] = fetchStub.firstCall.args as [string];
     assert.strictEqual(
       url,
-      "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent",
+      "https://generativelanguage.googleapis.com/v1/models/gemini-3.6-flash:generateContent",
     );
   });
 

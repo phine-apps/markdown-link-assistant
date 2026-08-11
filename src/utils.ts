@@ -79,16 +79,34 @@ export function formatCard(
 
   let extraTags = "";
   if (metadata.github) {
-    extraTags = `⭐ ${escapeHtml(metadata.github.stars)} | 📅 Updated: ${escapeHtml(metadata.github.lastUpdate)}`;
+    const parts = [];
+    if (metadata.github.stars !== "Unknown") parts.push(`⭐ ${escapeHtml(metadata.github.stars)}`);
+    if (metadata.github.forks !== "Unknown") parts.push(`🍴 ${escapeHtml(metadata.github.forks)}`);
+    if (metadata.github.issues !== "Unknown") parts.push(`🎯 ${escapeHtml(metadata.github.issues)}`);
+    extraTags = parts.join(" | ");
   } else if (metadata.youtube) {
-    extraTags = `📺 ${escapeHtml(metadata.youtube.channelName)} | ⏱ ${escapeHtml(formatYouTubeDuration(metadata.youtube.duration))}`;
+    const parts = [];
+    if (metadata.youtube.channelName !== "Unknown Channel") parts.push(`📺 ${escapeHtml(metadata.youtube.channelName)}`);
+    if (metadata.youtube.duration !== "Unknown") parts.push(`⏱ ${escapeHtml(formatYouTubeDuration(metadata.youtube.duration))}`);
+    extraTags = parts.join(" | ");
   } else if (metadata.qiita) {
-    extraTags = `👤 ${escapeHtml(metadata.qiita.author)} | ❤️ ${escapeHtml(metadata.qiita.likes)}`;
+    const parts = [];
+    if (metadata.qiita.author !== "Unknown") parts.push(`👤 ${escapeHtml(metadata.qiita.author)}`);
+    if (metadata.qiita.likes !== "Unknown") parts.push(`❤️ ${escapeHtml(metadata.qiita.likes)}`);
+    extraTags = parts.join(" | ");
   } else if (metadata.zenn) {
-    extraTags = `👤 ${escapeHtml(metadata.zenn.author)} | ❤️ ${escapeHtml(metadata.zenn.likes)}`;
+    const parts = [];
+    if (metadata.zenn.author !== "Unknown") parts.push(`👤 ${escapeHtml(metadata.zenn.author)}`);
+    if (metadata.zenn.likes !== "Unknown") parts.push(`❤️ ${escapeHtml(metadata.zenn.likes)}`);
+    extraTags = parts.join(" | ");
   } else if (metadata.stackOverflow) {
-    const accepted = metadata.stackOverflow.isAccepted ? " ✅" : "";
-    extraTags = `⬆️ ${escapeHtml(metadata.stackOverflow.score)} | 💬 ${escapeHtml(metadata.stackOverflow.answers)}${accepted}`;
+    const parts = [];
+    if (metadata.stackOverflow.score !== "Unknown") parts.push(`⬆️ ${escapeHtml(metadata.stackOverflow.score)}`);
+    if (metadata.stackOverflow.answers !== "Unknown") {
+      const accepted = metadata.stackOverflow.isAccepted ? " ✅" : "";
+      parts.push(`💬 ${escapeHtml(metadata.stackOverflow.answers)}${accepted}`);
+    }
+    extraTags = parts.join(" | ");
   }
 
   const siteInfo = metadata.siteName
