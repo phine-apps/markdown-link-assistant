@@ -82,6 +82,13 @@ export function formatCard(
     extraTags = `⭐ ${escapeHtml(metadata.github.stars)} | 📅 Updated: ${escapeHtml(metadata.github.lastUpdate)}`;
   } else if (metadata.youtube) {
     extraTags = `📺 ${escapeHtml(metadata.youtube.channelName)} | ⏱ ${escapeHtml(formatYouTubeDuration(metadata.youtube.duration))}`;
+  } else if (metadata.qiita) {
+    extraTags = `👤 ${escapeHtml(metadata.qiita.author)} | ❤️ ${escapeHtml(metadata.qiita.likes)}`;
+  } else if (metadata.zenn) {
+    extraTags = `👤 ${escapeHtml(metadata.zenn.author)} | ❤️ ${escapeHtml(metadata.zenn.likes)}`;
+  } else if (metadata.stackOverflow) {
+    const accepted = metadata.stackOverflow.isAccepted ? " ✅" : "";
+    extraTags = `⬆️ ${escapeHtml(metadata.stackOverflow.score)} | 💬 ${escapeHtml(metadata.stackOverflow.answers)}${accepted}`;
   }
 
   const siteInfo = metadata.siteName
