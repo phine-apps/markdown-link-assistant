@@ -26,6 +26,7 @@ export function formatInline(
   summary?: string,
 ): string {
   const safeTitle = (metadata.title || url)
+    .replace(/\\/g, "\\\\")
     .replace(/\[/g, "\\[")
     .replace(/\]/g, "\\]");
   const safeSummary = summary ? summary.replace(/--/g, "- -") : "";
@@ -35,6 +36,7 @@ export function formatInline(
 
 export function formatTitleOnly(url: string, metadata: LinkMetadata): string {
   const safeTitle = (metadata.title || url)
+    .replace(/\\/g, "\\\\")
     .replace(/\[/g, "\\[")
     .replace(/\]/g, "\\]");
   return `[${safeTitle}](${url})`;
@@ -156,8 +158,10 @@ export function isImageUrl(url: string): boolean {
     const isImageSubdomain =
       hostname.startsWith("images.") ||
       hostname.startsWith("img.") ||
-      hostname.includes("unsplash.com") ||
-      hostname.includes("imgix.net");
+      hostname === "unsplash.com" ||
+      hostname.endsWith(".unsplash.com") ||
+      hostname === "imgix.net" ||
+      hostname.endsWith(".imgix.net");
 
     const hasImageFormatQuery =
       parsed.searchParams.has("format") || parsed.searchParams.has("fm");

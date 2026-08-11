@@ -141,7 +141,24 @@ export async function getMetadataForUrl(url: string): Promise<LinkMetadata> {
     const metadata: LinkMetadata = { url, title, description, image, siteName };
 
     // Simple site-specific logic (heuristic)
-    if (url.includes("youtube.com/") || url.includes("youtu.be/")) {
+    let hostname = "";
+    try {
+      hostname = new URL(url).hostname.toLowerCase();
+    } catch {
+      // Ignore URL parsing errors
+    }
+
+    const isYouTube =
+      hostname === "youtube.com" ||
+      hostname.endsWith(".youtube.com") ||
+      hostname === "youtu.be" ||
+      hostname.endsWith(".youtu.be");
+
+    const isGitHub =
+      hostname === "github.com" ||
+      hostname.endsWith(".github.com");
+
+    if (isYouTube) {
       metadata.youtube = {
         channelName:
           $('link[itemprop="name"]').attr("content") || 
@@ -153,7 +170,7 @@ export async function getMetadataForUrl(url: string): Promise<LinkMetadata> {
           $('meta[name="uploadDate"]').attr("content") ||
           "Unknown Date",
       };
-    } else if (url.includes("github.com/")) {
+    } else if (isGitHub) {
       const repoDesc = $('meta[name="description"]').attr("content") || 
                        $('meta[property="og:description"]').attr("content") || "";
       

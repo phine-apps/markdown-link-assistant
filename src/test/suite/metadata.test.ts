@@ -137,4 +137,39 @@ suite("Metadata Service Test Suite", () => {
 
     assert.strictEqual(metadata.title, "Real Title");
   });
+
+  test("should NOT extract YouTube metadata for third-party host with youtube.com in path or query", async () => {
+    const html = `
+      <html>
+        <head>
+          <title>Attacker Page</title>
+          <link itemprop="name" content="Fake Channel" />
+        </head>
+      </html>
+    `;
+
+    fetchStub.resolves(mockResponse(html) as unknown as Response);
+
+    const url = "https://attacker.com/youtube.com/watch?v=123";
+    const metadata = await getMetadataForUrl(url);
+
+    assert.strictEqual(metadata.youtube, undefined, "Third party URL should not have youtube metadata");
+  });
+
+  test("should NOT extract GitHub metadata for third-party host with github.com in path", async () => {
+    const html = `
+      <html>
+        <head>
+          <title>Fake Repo</title>
+        </head>
+      </html>
+    `;
+
+    fetchStub.resolves(mockResponse(html) as unknown as Response);
+
+    const url = "https://evil.com/github.com/org/repo";
+    const metadata = await getMetadataForUrl(url);
+
+    assert.strictEqual(metadata.github, undefined, "Third party URL should not have github metadata");
+  });
 });
