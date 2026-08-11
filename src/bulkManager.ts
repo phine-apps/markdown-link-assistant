@@ -120,6 +120,9 @@ export async function bulkUnfurl(document: vscode.TextDocument, _secrets: vscode
         const batch = matches.slice(i, i + batchSize);
         await Promise.all(
           batch.map(async ({ url, range }) => {
+            if (token.isCancellationRequested) {
+              return;
+            }
             try {
               let replacement = "";
 
@@ -128,12 +131,15 @@ export async function bulkUnfurl(document: vscode.TextDocument, _secrets: vscode
               } else {
                 // 1. Validate first
                 const validation = await validateUrl(url);
-                if (validation.status !== ValidationStatus.ok) {
+                if (validation.status !== ValidationStatus.ok || token.isCancellationRequested) {
                   return;
                 }
 
                 // 2. Fetch Metadata
                 const metadata = await getMetadataForUrl(url);
+                if (token.isCancellationRequested) {
+                  return;
+                }
 
                 // 3. Generate AI Summary (if applicable)
                 let summary = "";
@@ -150,6 +156,10 @@ export async function bulkUnfurl(document: vscode.TextDocument, _secrets: vscode
                     lastAiError = (aiErr as Error).message;
                   }
                 }
+                
+                if (token.isCancellationRequested) {
+                  return;
+                }
 
                 // 4. Format
                 if (selection.id === "smart") {
@@ -161,15 +171,22 @@ export async function bulkUnfurl(document: vscode.TextDocument, _secrets: vscode
                 }
               }
 
-              if (replacement) {
+              if (replacement && !token.isCancellationRequested) {
                 results.push({ range, replacement });
               }
-              progress.report({ increment: (1 / matches.length) * 100 });
+              if (!token.isCancellationRequested) {
+                progress.report({ increment: (1 / matches.length) * 100 });
+              }
             } catch (_e) {
               // Ignore errors for individual links
             }
           })
         );
+      }
+
+      if (token.isCancellationRequested) {
+        vscode.window.showInformationMessage(vscode.l10n.t("Bulk unfurling was cancelled. No changes were applied."));
+        return;
       }
 
       // 2. Sort results by position (reverse order) to ensure stable application
@@ -228,11 +245,11 @@ export async function bulkUnfurl(document: vscode.TextDocument, _secrets: vscode
       } else {
         vscode.window.showWarningMessage(vscode.l10n.t("No links were unfurled (they might be already unfurled or broken)."));
       }
-        if (aiErrorCount > 0) {
-          vscode.window.showWarningMessage(
-            vscode.l10n.t("AI failed for {0} links. Last error: {1}", aiErrorCount, lastAiError || "Unknown")
-          );
-        }
+      if (aiErrorCount > 0) {
+        vscode.window.showWarningMessage(
+          vscode.l10n.t("AI failed for {0} links. Last error: {1}", aiErrorCount, lastAiError || "Unknown")
+        );
+      }
     }
   );
 }
