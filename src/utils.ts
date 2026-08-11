@@ -42,6 +42,27 @@ export function formatTitleOnly(url: string, metadata: LinkMetadata): string {
   return `[${safeTitle}](${url})`;
 }
 
+export function formatYouTubeDuration(duration: string): string {
+  if (!duration || !duration.startsWith("PT")) {
+    return duration;
+  }
+  
+  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) {
+    return duration;
+  }
+  
+  const hours = match[1] ? parseInt(match[1], 10) : 0;
+  const minutes = match[2] ? parseInt(match[2], 10) : 0;
+  const seconds = match[3] ? parseInt(match[3], 10) : 0;
+
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  } else {
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  }
+}
+
 export function formatCard(
   url: string,
   metadata: LinkMetadata,
@@ -60,7 +81,7 @@ export function formatCard(
   if (metadata.github) {
     extraTags = `⭐ ${escapeHtml(metadata.github.stars)} | 📅 Updated: ${escapeHtml(metadata.github.lastUpdate)}`;
   } else if (metadata.youtube) {
-    extraTags = `📺 ${escapeHtml(metadata.youtube.channelName)} | ⏱ ${escapeHtml(metadata.youtube.duration)}`;
+    extraTags = `📺 ${escapeHtml(metadata.youtube.channelName)} | ⏱ ${escapeHtml(formatYouTubeDuration(metadata.youtube.duration))}`;
   }
 
   const siteInfo = metadata.siteName
