@@ -7,7 +7,13 @@
 
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { getExistingLinkRange, isImageUrl } from "../../utils";
+import { LinkMetadata } from "../../metadataService";
+import {
+  formatInline,
+  formatTitleOnly,
+  getExistingLinkRange,
+  isImageUrl,
+} from "../../utils";
 
 suite("Utils Test Suite", () => {
   test("getExistingLinkRange should detect full link even if title is a URL", async () => {
@@ -139,5 +145,29 @@ https://unsplash.com/photo-123`;
     const result = getExistingLinkRange(mockDoc, pos);
 
     assert.strictEqual(result, undefined, "Should NOT find card for position below it");
+  });
+
+  test("formatTitleOnly should escape backslashes and brackets in title", () => {
+    const metadata: LinkMetadata = {
+      url: "https://example.com",
+      title: "C:\\path\\[file]\\",
+    };
+    const formatted = formatTitleOnly("https://example.com", metadata);
+    assert.strictEqual(
+      formatted,
+      "[C:\\\\path\\\\\\[file\\]\\\\](https://example.com)",
+    );
+  });
+
+  test("formatInline should escape backslashes and brackets in title and dash-dash in summary", () => {
+    const metadata: LinkMetadata = {
+      url: "https://example.com",
+      title: "Search \\ [AI]",
+    };
+    const formatted = formatInline("https://example.com", metadata, "foo -- bar");
+    assert.strictEqual(
+      formatted,
+      "[Search \\\\ \\[AI\\]](https://example.com) <!-- foo - - bar -->",
+    );
   });
 });

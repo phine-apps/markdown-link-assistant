@@ -45,7 +45,7 @@ suite("AI Service Test Suite", () => {
     
     // Verify fetch call
     const [url, init] = fetchStub.firstCall.args as [string, RequestInit];
-    assert.ok(url.includes("api.openai.com"));
+    assert.strictEqual(url, "https://api.openai.com/v1/chat/completions");
     const body = JSON.parse(init.body as string);
     assert.strictEqual(body.model, "gpt-4o-mini");
   });
@@ -66,7 +66,10 @@ suite("AI Service Test Suite", () => {
     assert.strictEqual(summary, "Gemini Summary Result");
     
     const [url] = fetchStub.firstCall.args as [string];
-    assert.ok(url.includes("generativelanguage.googleapis.com"));
+    assert.strictEqual(
+      url,
+      "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent",
+    );
   });
 
   test("should handle AI refusal gracefully", async () => {
