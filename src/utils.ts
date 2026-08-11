@@ -113,12 +113,17 @@ export function isValidUrl(url: string): boolean {
     return false;
   }
 
-  if (!s.includes(".") && !s.startsWith("http")) {
-    return false;
+  // Require explicit protocol for general URLs to prevent false positives 
+  // on code snippets like `document.getElementById` or `file.txt`
+  if (!/^https?:\/\//i.test(s)) {
+    // Exception for localhost for local development
+    if (!/^(localhost|127\.0\.0\.1)(:\d+)?(\/.*)?$/.test(s)) {
+      return false;
+    }
   }
 
   try {
-    const urlToTest = s.match(/^https?:\/\//i) ? s : `https://${s}`;
+    const urlToTest = /^https?:\/\//i.test(s) ? s : `http://${s}`;
     const parsed = new URL(urlToTest);
     return (
       (parsed.protocol === "http:" || parsed.protocol === "https:") &&
