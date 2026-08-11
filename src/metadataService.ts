@@ -17,6 +17,9 @@ export interface LinkMetadata {
   // Site-specific
   youtube?: { channelName: string; duration: string; publishDate: string };
   github?: { stars: string; description: string; lastUpdate: string };
+  qiita?: { likes: string; author: string };
+  zenn?: { likes: string; author: string };
+  stackOverflow?: { score: string; answers: string; isAccepted: boolean };
 }
 
 const metadataCache = new Map<string, LinkMetadata>();
@@ -158,6 +161,18 @@ export async function getMetadataForUrl(url: string): Promise<LinkMetadata> {
       hostname === "github.com" ||
       hostname.endsWith(".github.com");
 
+    const isQiita =
+      hostname === "qiita.com" ||
+      hostname.endsWith(".qiita.com");
+
+    const isZenn =
+      hostname === "zenn.dev" ||
+      hostname.endsWith(".zenn.dev");
+
+    const isStackOverflow =
+      hostname === "stackoverflow.com" ||
+      hostname.endsWith(".stackoverflow.com");
+
     if (isYouTube) {
       metadata.youtube = {
         channelName:
@@ -189,6 +204,47 @@ export async function getMetadataForUrl(url: string): Promise<LinkMetadata> {
         description: repoDesc,
         lastUpdate,
       };
+    } else if (isQiita) {
+      // Qiita author is often in twitter:creator or we can use the URL path (e.g. /@username)
+      let author = $('meta[name="twitter:creator"]').attr("content") || "";
+      if (!author) {
+        const match = url.match(/qiita\.com\/([^/]+)/);
+        if (match && match[1]) {
+          author = match[1].startsWith("@") ? match[1] : `@${match[1]}`;
+        } else {
+          author = "Unknown";
+        }
+      }
+      
+      // Attempt to find likes, but might be difficult if SSR only. Fallback to Unknown.
+      // Often, the title format is "Title - Qiita", we could also try to clean up title
+      const likes = "Unknown"; // Dynamic loaded in Qiita, hard to extract reliably from plain HTML
+      
+      metadata.qiita = { author, likes };
+    } else if (isZenn) {
+      // Zenn author is usually the first part of the path: zenn.dev/username/...
+      let author = "Unknown";
+      const match = url.match(/zenn\.dev\/([^/]+)/);
+      if (match && match[1]) {
+        author = `@${match[1]}`;
+      }
+      
+      // Likes are also dynamically loaded or embedded in script tags. Fallback to Unknown.
+      const likes = "Unknown";
+      
+      metadata.zenn = { author, likes };
+    } else if (isStackOverflow) {
+      const score = $('.js-vote-count').first().text().trim() || "0";
+      
+      const answersText = $('#answers-header h2, #answers-header h3').first().text().trim() || 
+                          $('span[itemprop="answerCount"]').text().trim() || 
+                          "0";
+      const answersMatch = answersText.match(/\d+/);
+      const answers = answersMatch ? answersMatch[0] : "0";
+      
+      const isAccepted = $('.js-accepted-answer-indicator').not('.d-none').length > 0;
+      
+      metadata.stackOverflow = { score, answers, isAccepted };
     }
 
     addToCache(url, metadata);

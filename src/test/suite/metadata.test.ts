@@ -172,4 +172,64 @@ suite("Metadata Service Test Suite", () => {
 
     assert.strictEqual(metadata.github, undefined, "Third party URL should not have github metadata");
   });
+
+  test("should extract Qiita specific metadata", async () => {
+    const html = `
+      <html>
+        <head>
+          <meta name="twitter:creator" content="@qiita_user" />
+        </head>
+      </html>
+    `;
+
+    fetchStub.resolves(mockResponse(html) as unknown as Response);
+
+    const url = "https://qiita.com/qiita_user/items/12345";
+    const metadata = await getMetadataForUrl(url);
+
+    assert.ok(metadata.qiita);
+    assert.strictEqual(metadata.qiita?.author, "@qiita_user");
+    assert.strictEqual(metadata.qiita?.likes, "Unknown");
+  });
+
+  test("should extract Zenn specific metadata", async () => {
+    const html = `
+      <html>
+        <head>
+          <title>Zenn Article</title>
+        </head>
+      </html>
+    `;
+
+    fetchStub.resolves(mockResponse(html) as unknown as Response);
+
+    const url = "https://zenn.dev/zenn_user/articles/12345";
+    const metadata = await getMetadataForUrl(url);
+
+    assert.ok(metadata.zenn);
+    assert.strictEqual(metadata.zenn?.author, "@zenn_user");
+    assert.strictEqual(metadata.zenn?.likes, "Unknown");
+  });
+
+  test("should extract Stack Overflow specific metadata", async () => {
+    const html = `
+      <html>
+        <body>
+          <div class="js-vote-count">42</div>
+          <div id="answers-header"><h2>3 Answers</h2></div>
+          <div class="js-accepted-answer-indicator"></div>
+        </body>
+      </html>
+    `;
+
+    fetchStub.resolves(mockResponse(html) as unknown as Response);
+
+    const url = "https://stackoverflow.com/questions/12345/how-to-do-x";
+    const metadata = await getMetadataForUrl(url);
+
+    assert.ok(metadata.stackOverflow);
+    assert.strictEqual(metadata.stackOverflow?.score, "42");
+    assert.strictEqual(metadata.stackOverflow?.answers, "3");
+    assert.strictEqual(metadata.stackOverflow?.isAccepted, true);
+  });
 });
