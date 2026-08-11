@@ -84,7 +84,7 @@ suite("Paste Provider Logic Test", () => {
     );
   });
 
-  test("Should handle URLs without protocol (lenient check)", async () => {
+  test("Should ignore URLs without protocol to prevent code snippet false positives", async () => {
     configStub.returns({
       get: (key: string) => {
         if (key === "autoUnfurl") { return true; }
@@ -106,8 +106,8 @@ suite("Paste Provider Logic Test", () => {
 
     assert.strictEqual(
       edits.length,
-      1,
-      "Should identify example.com and return 1 edit for 'ask' mode",
+      0,
+      "Should ignore example.com as a valid URL without a protocol",
     );
   });
 });
