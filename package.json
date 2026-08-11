@@ -4,7 +4,7 @@
   "displayName": "Markdown Link Assistant",
   "description": "The ultimate link manager for Markdown. Effortless unfurling, Notion-like cards, AI summaries, and instant previews.",
   "l10n": "./l10n",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "icon": "icons/icon128.png",
   "publisher": "phine-apps",
   "license": "MIT",
@@ -175,17 +175,17 @@
         },
         "markdown-link-assistant.geminiModel": {
           "type": "string",
-          "default": "gemini-2.5-flash",
+          "default": "gemini-3.6-flash",
           "description": "%config.geminiModel.description%"
         },
         "markdown-link-assistant.claudeModel": {
           "type": "string",
-          "default": "claude-3-5-sonnet-latest",
+          "default": "claude-sonnet-5",
           "description": "%config.claudeModel.description%"
         },
         "markdown-link-assistant.openaiModel": {
           "type": "string",
-          "default": "gpt-4o-mini",
+          "default": "gpt-5-mini",
           "description": "%config.openaiModel.description%"
         },
         "markdown-link-assistant.geminiEndpoint": {
@@ -250,7 +250,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^26.1.1",
     "@types/sinon": "^22.0.0",
-    "@types/vscode": "1.125.0",
+    "@types/vscode": "1.97.0",
     "@typescript-eslint/eslint-plugin": "^8.63.0",
     "@typescript-eslint/parser": "^8.63.0",
     "@vscode/test-electron": "^3.1.0",
